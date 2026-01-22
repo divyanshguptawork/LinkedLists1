@@ -2,10 +2,11 @@
 #define STUDENT_H
 
 #include <iostream>
+#include <iomanip>
 #include <cstring>
 using namespace std;
 
-// simple Student class used for testing the Node class
+// Represents a single student record
 class Student {
 private:
     char firstName[50];
@@ -14,8 +15,7 @@ private:
     float gpa;
 
 public:
-    Student(const char* first, const char* last, int idNum, float g)
-    {
+    Student(const char* first, const char* last, int idNum, float g) {
         strcpy(firstName, first);
         strcpy(lastName, last);
         id = idNum;
@@ -23,8 +23,8 @@ public:
     }
 
     void print() const {
-        cout << firstName << " " << lastName
-             << " (ID: " << id << ", GPA: " << gpa << ")" << endl;
+        cout << firstName << " " << lastName << ", " << id << ", "
+             << fixed << setprecision(2) << gpa << endl;
     }
 
     int getID() const { return id; }
