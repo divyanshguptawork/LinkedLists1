@@ -4,11 +4,9 @@
 #include "Student.h"
 using namespace std;
 
-// Function prototypes
 void addStudent(Node*& head);
 void addRecursive(Node*& current, Node* newNode);
 void printList(Node* current);
-bool deleteStudent(Node*& current, int id);
 void deleteRecursive(Node*& current, int id);
 float averageGPA(Node* current, int count, float total);
 void clearList(Node*& current);
@@ -25,45 +23,43 @@ int main() {
         cout << "\nEnter command: ";
         cin >> command;
 
-        for (auto& c : command) c = toupper(c); // normalize case
+        for (char& c : command) c = toupper(c);
 
         if (command == "ADD") {
             addStudent(head);
-        } 
+        }
         else if (command == "PRINT") {
             if (head == nullptr)
                 cout << "List is empty.\n";
             else
                 printList(head);
-        } 
+        }
         else if (command == "DELETE") {
             int id;
             cout << "Enter student ID to delete: ";
             cin >> id;
             deleteRecursive(head, id);
-        } 
+        }
         else if (command == "AVERAGE") {
-            if (head == nullptr) {
+            if (head == nullptr)
                 cout << "List is empty.\n";
-            } else {
-                float avg = averageGPA(head, 0, 0);
-                cout << "Average GPA: " << fixed << setprecision(2) << avg << endl;
-            }
-        } 
+            else
+                cout << "Average GPA: "
+                     << fixed << setprecision(2)
+                     << averageGPA(head, 0, 0) << endl;
+        }
         else if (command == "QUIT") {
             running = false;
-        } 
+        }
         else {
             cout << "Unknown command.\n";
         }
     }
 
-    clearList(head); // Free all memory
-    cout << "Program ended.\n";
+    clearList(head);
     return 0;
 }
 
-// Add student with recursive sorted insertion
 void addStudent(Node*& head) {
     char first[50], last[50];
     int id;
@@ -81,33 +77,25 @@ void addStudent(Node*& head) {
     Student* s = new Student(first, last, id, gpa);
     Node* newNode = new Node(s);
 
-    if (head == nullptr || s->getID() < head->getStudent()->getID()) {
-        newNode->setNext(head);
-        head = newNode;
-    } else {
-        addRecursive(head, newNode);
-    }
+    addRecursive(head, newNode);
 }
 
-// Recursive helper to insert sorted by ID
 void addRecursive(Node*& current, Node* newNode) {
-    if (current->getNext() == nullptr || 
-        newNode->getStudent()->getID() < current->getNext()->getStudent()->getID()) {
-        newNode->setNext(current->getNext());
-        current->setNext(newNode);
-    } else {
-        addRecursive(current->getNext(), newNode);
+    if (current == nullptr ||
+        newNode->getStudent()->getID() < current->getStudent()->getID()) {
+        newNode->setNext(current);
+        current = newNode;
+        return;
     }
+    addRecursive(current->getNextRef(), newNode);
 }
 
-// Recursive print
 void printList(Node* current) {
     if (current == nullptr) return;
     current->getStudent()->print();
     printList(current->getNext());
 }
 
-// Recursive delete
 void deleteRecursive(Node*& current, int id) {
     if (current == nullptr) {
         cout << "Student not found.\n";
@@ -122,22 +110,21 @@ void deleteRecursive(Node*& current, int id) {
         return;
     }
 
-    deleteRecursive(current->getNext(), id);
+    deleteRecursive(current->getNextRef(), id);
 }
 
-// Recursive GPA average
 float averageGPA(Node* current, int count, float total) {
     if (current == nullptr) {
         if (count == 0) return 0;
         return total / count;
     }
-    return averageGPA(current->getNext(), count + 1, total + current->getStudent()->getGPA());
+    return averageGPA(current->getNext(), count + 1,
+                      total + current->getStudent()->getGPA());
 }
 
-// Recursively free all memory at the end
 void clearList(Node*& current) {
     if (current == nullptr) return;
-    clearList(current->getNext());
+    clearList(current->getNextRef());
     delete current;
     current = nullptr;
 }
