@@ -13,13 +13,12 @@ void clearList(Node*& current);
 
 int main() {
     Node* head = nullptr;
-    bool running = true;
     string command;
 
     cout << "Linked List Student Manager\n";
     cout << "Commands: ADD, PRINT, DELETE, AVERAGE, QUIT\n";
 
-    while (running) {
+    while (true) {
         cout << "\nEnter command: ";
         cin >> command;
 
@@ -29,27 +28,25 @@ int main() {
             addStudent(head);
         }
         else if (command == "PRINT") {
-            if (head == nullptr)
-                cout << "List is empty.\n";
-            else
-                printList(head);
+            if (!head) cout << "List is empty.\n";
+            else printList(head);
         }
         else if (command == "DELETE") {
             int id;
-            cout << "Enter student ID to delete: ";
+            cout << "Enter student ID: ";
             cin >> id;
             deleteRecursive(head, id);
         }
         else if (command == "AVERAGE") {
-            if (head == nullptr)
-                cout << "List is empty.\n";
-            else
-                cout << "Average GPA: "
-                     << fixed << setprecision(2)
+            if (!head) cout << "List is empty.\n";
+            else {
+                cout << fixed << setprecision(2)
+                     << "Average GPA: "
                      << averageGPA(head, 0, 0) << endl;
+            }
         }
         else if (command == "QUIT") {
-            running = false;
+            break;
         }
         else {
             cout << "Unknown command.\n";
@@ -65,13 +62,13 @@ void addStudent(Node*& head) {
     int id;
     float gpa;
 
-    cout << "Enter first name: ";
+    cout << "First name: ";
     cin >> first;
-    cout << "Enter last name: ";
+    cout << "Last name: ";
     cin >> last;
-    cout << "Enter student ID: ";
+    cout << "Student ID: ";
     cin >> id;
-    cout << "Enter GPA: ";
+    cout << "GPA: ";
     cin >> gpa;
 
     Student* s = new Student(first, last, id, gpa);
@@ -82,22 +79,27 @@ void addStudent(Node*& head) {
 
 void addRecursive(Node*& current, Node* newNode) {
     if (current == nullptr ||
-        newNode->getStudent()->getID() < current->getStudent()->getID()) {
+        newNode->getStudent()->getID() <
+        current->getStudent()->getID()) {
+
         newNode->setNext(current);
         current = newNode;
         return;
     }
-    addRecursive(current->getNextRef(), newNode);
+
+    Node* next = current->getNext();
+    addRecursive(next, newNode);
+    current->setNext(next);
 }
 
 void printList(Node* current) {
-    if (current == nullptr) return;
+    if (!current) return;
     current->getStudent()->print();
     printList(current->getNext());
 }
 
 void deleteRecursive(Node*& current, int id) {
-    if (current == nullptr) {
+    if (!current) {
         cout << "Student not found.\n";
         return;
     }
@@ -110,21 +112,25 @@ void deleteRecursive(Node*& current, int id) {
         return;
     }
 
-    deleteRecursive(current->getNextRef(), id);
+    Node* next = current->getNext();
+    deleteRecursive(next, id);
+    current->setNext(next);
 }
 
 float averageGPA(Node* current, int count, float total) {
-    if (current == nullptr) {
+    if (!current) {
         if (count == 0) return 0;
         return total / count;
     }
-    return averageGPA(current->getNext(), count + 1,
+    return averageGPA(current->getNext(),
+                      count + 1,
                       total + current->getStudent()->getGPA());
 }
 
 void clearList(Node*& current) {
-    if (current == nullptr) return;
-    clearList(current->getNextRef());
+    if (!current) return;
+    Node* next = current->getNext();
+    clearList(next);
     delete current;
     current = nullptr;
 }
